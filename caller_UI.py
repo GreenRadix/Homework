@@ -140,7 +140,6 @@ class Ui_SIMCaller(object):
         self.CallTimelabelMod_1 = QtWidgets.QLabel(self.layoutWidget4)
         self.CallTimelabelMod_1.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.CallTimelabelMod_1.setObjectName("CallTimelabelMod_1")
-
         self.horizontalLayout_3.addWidget(self.CallTimelabelMod_1)
 
         self.scrollArea = QtWidgets.QScrollArea(self.ModemBox_1)
