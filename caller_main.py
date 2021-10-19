@@ -1,5 +1,4 @@
 # Імпортуємо наш графічний інтерфейс з файлу
-
 from caller_UI import Ui_SIMCaller
 # import os
 import sys
@@ -7,6 +6,7 @@ import time
 from PyQt5 import QtWidgets
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice
+
 
 
 class SIMCaller(QtWidgets.QMainWindow):
@@ -45,6 +45,10 @@ class SIMCaller(QtWidgets.QMainWindow):
         self.ui.ResetAllButt.clicked.connect(self.resetall)
 
     def findPort(self):
+        """
+        What to do: Finding free serial ports
+        :return: displays available ports in combobox
+        """
         #очищаємо ComboBox від попереднього списку портів
         self.ui.portComboBoxMod_1.clear()
         # створюємо список всіх доступних портів у системі
@@ -75,11 +79,13 @@ class SIMCaller(QtWidgets.QMainWindow):
                  f" {int(self.ui.boudrateComboBoxMod_1.currentText())}</font>")
             time.sleep(2)
             cmds = [
-                b'AT\r\n', # test if basic function is working
-                b'AT+GMI\r\n', # Request Manufacturer Identification
-                b'AT+GMM\r\n', # Request TA Model Identification
-                b'AT+GMR\r\n', # Request TA Revision Identification of Software Release
-                b'AT+GSN\r\n', # Request TA Serial Number Identification(IMEI)
+                b'ATE0\n',  # Turn command echo on (ATE1) or off (ATE0)
+                b'AT\n', # test if basic function is working
+                b'AT+GMI\n', # Request Manufacturer Identification
+                b'AT+GMM\n', # Request TA Model Identification
+                b'AT+GMR\n', # Request TA Revision Identification of Software Release
+                b'AT+GSN\n', # Request TA Serial Number Identification(IMEI)
+                b'AT\n',  # test if basic function is workinG
                 # b'ATD 0665791106;\r\n' # ring to number
             ]
             for cmd in cmds:
@@ -87,27 +93,32 @@ class SIMCaller(QtWidgets.QMainWindow):
                     self.serial.write(cmd)
                     self.ui.textBrowserMod_1.append \
                         (f"<font color = Black>{cmd}</font>")
+                    time.sleep(2)
                     try:
-                        txt = self.serial.readLine()
-                        print(txt)
-                        self.ui.textBrowserMod_1.append \
-                            (f"<font color = Blue>{txt}</font>")
+                        if self.serial.isOpen():
+                            if self.serial.waitForReadyRead():
+                                while self.serial.canReadLine():
+                                    txt = self.serial.readLine()
+                                    # txt = self.serial.readAll()
+                                    print(txt)
+                                    self.ui.textBrowserMod_1.append(f"<font color = Blue>{txt}</font>")
+                                    time.sleep(1)
+                        else: print("Помилка! Не можу відкрити заданий порт.")
                     except:
                         print("Помилка прийому")
                 except:
                     print("Помилка передачі")
 
-
-        # else:
-        #     self.ui.textBrowserMod_1.append \
-        #         (f"<font color = Green>Порт "
-        #          f"{self.ui.portComboBoxMod_1.currentText()}"
-        #          f" вже відкрито</font>")
-
             #  while self.serial.canReadLine():
             #     text = self.serial.readLine()
-            #     self.ui.textBrowserMod_1.append \
-            #         (f"<font color = Blue>{text}</font>")
+        # print(self.serial.isOpen())
+        # print(self.serial.isReadable())
+
+        # while self.serial.canReadLine():
+        # text = self.serial.readLine()
+        #     self.ui.textBrowserMod_1.append \
+        #         (f"<font color = Blue>{text}</font>")
+
         # else:
         #     raise IOError (self.ui.textBrowserMod_1.append(
         #     (f"<font color = Red>Cannot connect to device on port"
@@ -123,8 +134,10 @@ class SIMCaller(QtWidgets.QMainWindow):
 
     def readPort(self):
         while True:
-            rcv = self.serial.readline()  # receive data
+            # rcv = self.serial.readline()  # receive data
+            rcv = self.serial.readAll()
             print(rcv)
+            return rcv
             # self.process_bytes(bytes(self.serial.readAll()))
         # rx = self.serial.readline()
         # # rxs = str(rx, 'UTF-8')
@@ -132,7 +145,7 @@ class SIMCaller(QtWidgets.QMainWindow):
         #
 
     def writePort(self, cmd):
-        # cmd = x
+        # Write to serial port
         self.serial.write(cmd)
 
     def disconnect(self):
@@ -140,7 +153,7 @@ class SIMCaller(QtWidgets.QMainWindow):
         if self.serial.isOpen():
             self.serial.close()
             self.ui.textBrowserMod_1.append\
-                (f"<font color = Green>Порт"
+                (f"<font color = Green>Порт "
                  f"{self.ui.portComboBoxMod_1.currentText()} закрито</font>")
         else:
             print("Serial no open")
@@ -185,17 +198,6 @@ if __name__ == "__main__":
     main()
     myapp.show()
     sys.exit(app.exec_())
-#-----------------------------------------------------------------------------
 
-    # class SIMCaller(Ui_SIMCaller):
-# -----------
-# if __name__ == "__main__":
-    #     app = QtWidgets.QApplication(sys.argv)
-    #     SIMCaller = QtWidgets.QMainWindow()
-    #     ui = Ui_SIMCaller()
-    #     ui.setupUi(SIMCaller)
-    #     SIMCaller.show()
-    #     sys.exit(app.exec_())
-#-----------------------------------------------------------------------------
 
 
