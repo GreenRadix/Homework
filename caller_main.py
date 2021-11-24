@@ -78,6 +78,7 @@ class SIMCaller(QtWidgets.QMainWindow):
                  f" відкрито на швидкості"
                  f" {int(self.ui.boudrateComboBoxMod_1.currentText())}</font>")
             time.sleep(2)
+            # test commands
             cmds = [
                 b'ATE0\n',  # Turn command echo on (ATE1) or off (ATE0)
                 b'AT\n', # test if basic function is working
@@ -108,29 +109,6 @@ class SIMCaller(QtWidgets.QMainWindow):
                         print("Помилка прийому")
                 except:
                     print("Помилка передачі")
-
-            #  while self.serial.canReadLine():
-            #     text = self.serial.readLine()
-        # print(self.serial.isOpen())
-        # print(self.serial.isReadable())
-
-        # while self.serial.canReadLine():
-        # text = self.serial.readLine()
-        #     self.ui.textBrowserMod_1.append \
-        #         (f"<font color = Blue>{text}</font>")
-
-        # else:
-        #     raise IOError (self.ui.textBrowserMod_1.append(
-        #     (f"<font color = Red>Cannot connect to device on port"
-        #      f" {self.ui.portComboBoxMod_1.currentText()}</font>")))
-
-        # if self.serial.open(QIODevice.ReadWrite):
-        #     print("Connect work too")
-        #     # self.serial.readyRead.connect(self.readport)
-        # else:
-        #     raise IOError (self.ui.textBrowserMod_1.append(
-        #         (f"Cannot connect to device on port"
-        #          f" {self.ui.portComboBoxMod_1.currentText()}")))
 
     def readPort(self):
         while True:
@@ -190,14 +168,15 @@ class Connector(Modem):
 
 #Main function that calls other functions - Makes script reusable
 def main():
-    pass
+    app = QtWidgets.QApplication(sys.argv) # Створюємо новий екземпляр QApplication
+    myapp = SIMCaller()  # Створюємо об'єкт класу SIMCaller
+    myapp.show() # Показуємо вікно
+    sys.exit(app.exec_()) # Коректне завершення процесів при закритті програми
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    myapp = SIMCaller()
-    main()
-    myapp.show()
-    sys.exit(app.exec_())
+
+if __name__ == "__main__": # Якщо ми запускаємо файл навпростець, а не імпортуємо
+    main()                 # то запускаємо функцію main()
+
 
 
 
